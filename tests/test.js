@@ -108,6 +108,12 @@ check('따옴표 안 쉼표·줄바꿈·이중 따옴표',[...P],()=>{
   assert.equal(p.records.length,1);assert.equal(p.records[0].title,'제목, 공론화 "검토"\n둘째 줄');
 });
 check('BOM과 CRLF',[...P],()=>{assert.equal(A.parseCSV('﻿id,title,year,policy_stage,hci_dimension\r\nA,자료,2023,의제설정,접근성·포용성\r\n').records.length,1);});
+check('머리줄 열 이름은 대소문자를 가리지 않음',[...P],()=>{
+  const p=A.parseCSV('ID,Title,Year,Policy_Stage,HCI_Dimension\nA,자료,2023,의제설정,접근성·포용성\n');
+  assert.equal(p.records.length,1);assert.equal(p.records[0].policy_stage,'의제설정');assert.equal(p.records[0].hci_dimension,'접근성·포용성');
+  assert.equal(p.warnings.length,1);assert.match(p.warnings[0],/소문자로 맞춰/);
+  assert.equal(A.parseCSV('id,title,year,policy_stage,hci_dimension\nA,자료,2023,의제설정,접근성·포용성\n').warnings.length,0);
+});
 check('필수 열이 없으면 멈춤',[...P],()=>{assert.throws(()=>A.parseCSV('title,year\nno,2024'),/필수 열 누락/);});
 check('등록되지 않은 범주는 미분류로 남김',[...N,...M],()=>{
   const rec=A.validateAndNormalize([{id:'X',title:'검증',year:'2024',policy_stage:'UNKNOWN',hci_dimension:'정보이해·설명'}]);

@@ -25,10 +25,14 @@ window.CIVICTA = window.CIVICTA || {};
     const all=rows(String(text??'').replace(/^﻿/,''));
     const head=all.shift();
     if(!head)throw Error('빈 CSV입니다. 머리줄이 필요합니다.');
-    const header=head.cells.map(h=>h.trim());
+    // 열 이름은 대소문자를 가리지 않는다: 엑셀·Zotero 등에서 내보내면 'ID,Title,Year'처럼 첫 글자가 대문자인 경우가 흔하다
+    // (규칙의 열 이름이 모두 소문자라 소문자로 맞춰 읽고, 바꿔 읽었으면 경고에 한 줄 남긴다)
+    const header=head.cells.map(h=>h.trim().toLowerCase());
+    const recased=head.cells.some(h=>h.trim()!==h.trim().toLowerCase());
     const lack=rules.requiredColumns.filter(c=>!header.includes(c));
     if(lack.length)throw Error('필수 열 누락: '+lack.join(', '));
     const records=[],warnings=[];
+    if(recased)warnings.push(`1줄: 머리줄 열 이름을 소문자로 맞춰 읽었습니다 (${head.cells.map(h=>h.trim()).join(',')}).`);
     all.forEach(({line,cells})=>{
       if(!cells.some(c=>c.trim()))return;   // 빈 줄은 조용히 건너뜀
       const label=cells[0]&&cells[0].trim()?` ${cells[0].trim()}`:'';
