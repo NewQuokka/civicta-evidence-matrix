@@ -16,9 +16,9 @@
 ## 설명영상 (30초 안팎)
 배포 주소를 그대로 녹화하고, 내레이션은 팀원 목소리로 넣었습니다. 실존 문헌 16편 → 매트릭스 → 키보드로 칸 선택 → 자동화 견본을 사람이 고쳐 확정 → 보고서 내보내기 순서입니다.
 
-[![설명영상 미리보기](media/intro-teaser.gif)](media/intro.mp4)
+https://github.com/user-attachments/assets/8801d966-0ebd-42ee-9c01-b200677fb4e6
 
-- 영상 파일: [media/intro.mp4](media/intro.mp4) (1280×720, 10MB 이하) · 대본: [reports/시연영상_스토리보드.md](reports/시연영상_스토리보드.md)
+- 위 재생기는 GitHub에 올린 같은 영상입니다(저장소 안 mp4는 GitHub가 재생하지 않음). 원본 파일: [media/intro.mp4](media/intro.mp4) (1280×720, 10MB 이하) · 대본: [reports/시연영상_스토리보드.md](reports/시연영상_스토리보드.md)
 
 ## 두 가지 예시 입력
 | 버튼 | 파일 | 성격 |
