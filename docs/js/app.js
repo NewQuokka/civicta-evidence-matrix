@@ -20,7 +20,9 @@
    const validated=normalize(records);
    state.records=validated.records;state.warnings=[...warnings,...validated.warnings];state.selected=null;
    $('search').value='';$('policy-filter').value='all';$('hci-filter').value='all';$('verification-filter').value='all';
-   tell(`${label}: ${state.records.length}건을 읽었습니다. 분류 미확정 기록과 오류 안내를 확인하세요.`);
+   // 확인할 항목이 실제로 있을 때만 안내를 붙인다(Refs #20). 경고 0건이면 읽은 건수만 알린다.
+   const n=state.warnings.length;
+   tell(`${label}: ${state.records.length}건을 읽었습니다.`+(n?` 확인할 항목 ${n}건이 아래에 있습니다.`:''));
    render();
  }
  function currentRows(){return filterRecords(state.records,{keyword:$('search').value,verification:$('verification-filter').value,policy_stage:$('policy-filter').value,hci_dimension:$('hci-filter').value});}
