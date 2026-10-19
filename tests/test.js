@@ -119,6 +119,16 @@ check('등록되지 않은 범주는 미분류로 남김',[...N,...M],()=>{
   const rec=A.validateAndNormalize([{id:'X',title:'검증',year:'2024',policy_stage:'UNKNOWN',hci_dimension:'정보이해·설명'}]);
   assert.equal(rec.records[0].policy_stage,'미분류');assert.equal(A.analyze(rec.records).unclassified,1);
 });
+check('가운뎃점 변형(ㆍ ‧ ・)은 ·로 맞춰 분류하고 알림 (#19)',[...N,...M],()=>{
+  const n=A.validateAndNormalize([{id:'D-01',title:'가운뎃점',year:'2024',policy_stage:'숙의ㆍ공론화',hci_dimension:'숙의‧상호작용',evidence_type:'개념・규범연구'}]);
+  const r=n.records[0];
+  assert.equal(r.policy_stage,'숙의·공론화');assert.equal(r.hci_dimension,'숙의·상호작용');assert.equal(r.evidence_type,'개념·규범연구');
+  assert.equal(r.raw_policy_stage,'숙의ㆍ공론화');assert.equal(r.raw_hci_dimension,'숙의‧상호작용');
+  assert.equal(A.analyze(n.records).counted,1);
+  assert.equal(n.warnings.length,1);assert.match(n.warnings[0],/^D-01: 가운뎃점을 ·로 맞춰 읽었습니다 \(정책단계 '숙의ㆍ공론화', HCI 차원 '숙의‧상호작용', 연구 유형 '개념・규범연구'\)\.$/);
+  const off=A.validateAndNormalize([{id:'D-02',title:'목록 밖',year:'2024',policy_stage:'공론ㆍ숙의',hci_dimension:'숙의·상호작용'}]);
+  assert.equal(off.records[0].policy_stage,'미분류');assert.equal(off.warnings.length,1);assert.match(off.warnings[0],/등록되지 않은 정책단계 → 미분류 \(공론ㆍ숙의\)/);
+});
 check('CSV 왕복: 내보낸 CSV를 다시 넣어도 건수·분류 같음',[...P,...N,...M,...E],()=>{
   const orig=A.validateAndNormalize(A.parseCSV(CIVICTA_REAL_CSV).records).records;
   const round=A.validateAndNormalize(A.parseCSV(A.toCSV(orig)).records).records;
