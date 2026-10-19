@@ -74,6 +74,12 @@ id,title,year,doi,technology,policy_stage,hci_dimension,evidence_type,policy_lin
 - 커밋·PR에는 `Refs #이슈번호`를 쓰고 완료 조건을 확인한 뒤 이슈를 닫습니다.
 - `main`은 보호 브랜치입니다. PR → 상대 승인 1명 → 테스트(GitHub Actions `tests`) 통과 뒤에만 병합되고, 강제 푸시와 삭제는 막혀 있습니다. 검사는 `node tests/test.js`·`node tests/ai.test.js`와 같습니다.
 
+## 인접 팀에 보낸 개선 제안
+- 받은 팀 저장소: [LoveEvaLee/ai-trend-monitor](https://github.com/LoveEvaLee/ai-trend-monitor) (AI 동향 모니터)
+- 보낸 PR: https://github.com/LoveEvaLee/ai-trend-monitor/pull/29
+- 제안 한 줄: 머리글 없는 CSV나 열 순서가 다른 CSV를 넣으면 기사가 경고 없이 빠지는 문제를, 열 이름으로 칸을 찾고 달리 읽은 경우 알리도록 고침
+- 자세한 기록: [reports/인접팀_피드백_양식.md](reports/인접팀_피드백_양식.md)
+
 ## 파일
 ```
 docs/            GitHub Pages (main /docs)
