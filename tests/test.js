@@ -135,6 +135,16 @@ check('CSV 왕복: 내보낸 CSV를 다시 넣어도 건수·분류 같음',[...
   assert.equal(round.length,16);assert.equal(A.analyze(round).counted,A.analyze(orig).counted);
   assert.deepEqual(round.map(r=>r.policy_stage+r.hci_dimension),orig.map(r=>r.policy_stage+r.hci_dimension));
 });
+check('CSV 왕복: 미분류 문헌의 원래 값과 경고·미분류 사유가 그대로',[...P,...N,...E],()=>{
+  const first=A.validateAndNormalize(A.parseCSV(read('other-input.csv')).records);
+  const again=A.validateAndNormalize(A.parseCSV(A.toCSV(first.records)).records);
+  const t02=again.records.find(r=>r.id==='T-02'),t06=again.records.find(r=>r.id==='T-06');
+  assert.equal(t02.raw_policy_stage,'공론화');assert.equal(t02.policy_stage,'미분류');
+  assert.equal(t06.raw_hci_dimension,'');assert.equal(t06.hci_dimension,'미분류');
+  const cat=w=>w.filter(t=>t.includes('등록되지 않은')).map(t=>t.replace(/^\d+줄 /,''));
+  assert.deepEqual(cat(again.warnings),cat(first.warnings));
+  assert.deepEqual(A.unclassifiedReasons(again.records,again.warnings),A.unclassifiedReasons(first.records,first.warnings));
+});
 check('보고서(.md)에 건수와 한계 문구',[...N,...M,...E],()=>{
   const rows=A.validateAndNormalize(CIVICTA_DEMO).records,md=A.toMarkdown(rows,A.analyze(rows));
   assert(md.includes('집계 대상: 12건'));assert(md.includes('실증 분석 결과가 아닙니다'));assert(md.includes(CIVICTA_RULES.gapInterpretation));
