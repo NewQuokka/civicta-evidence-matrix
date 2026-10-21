@@ -7,8 +7,11 @@ window.CIVICTA = window.CIVICTA || {};
    if(/^[=+@\-\t\r]/.test(s))s="'"+s;
    return '"'+s.replace(/"/g,'""')+'"';
  }
+ // \uBBF8\uBD84\uB958\uB85C \uBC14\uB010 \uC815\uCC45\uB2E8\uACC4\u00B7HCI \uCC28\uC6D0\uC740 normalize.js\uAC00 \uB0A8\uAE34 \uC6D0\uB798 \uAC12(raw_*)\uC73C\uB85C \uB0B4\uBCF4\uB0B8\uB2E4.
+ // '\uBBF8\uBD84\uB958'\uB97C \uADF8\uB300\uB85C \uC4F0\uBA74 \uB2E4\uC2DC \uB123\uC744 \uB54C \uC624\uD0C0 \uC6D0\uBB38\uC774 \uC0AC\uB77C\uC9C0\uACE0, \uBE48\uCE78\uC774 '\uBAA9\uB85D \uBC16 \uAC12 \uBBF8\uBD84\uB958' \uACBD\uACE0\uB85C \uBC14\uB010\uB2E4.
+ const cellValue=(r,c)=>r[c]==='\uBBF8\uBD84\uB958'&&('raw_'+c) in r?r['raw_'+c]:r[c];
  function toCSV(rows,rules=window.CIVICTA_RULES){
-   return '\uFEFF'+[rules.csvColumns.join(','),...rows.map(r=>rules.csvColumns.map(c=>csvCell(r[c])).join(','))].join('\r\n');
+   return '\uFEFF'+[rules.csvColumns.join(','),...rows.map(r=>rules.csvColumns.map(c=>csvCell(cellValue(r,c))).join(','))].join('\r\n');
  }
  // 미분류 사유: normalize.js 경고("ID: 등록되지 않은 정책단계 → 미분류 (값)")가 있으면 그 값을, 없으면 빈칸으로 본다 (Refs #6)
  function unclassifiedReasons(rows,warnings=[]){
