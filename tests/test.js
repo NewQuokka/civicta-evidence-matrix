@@ -6,7 +6,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 global.window=global;
 const loaded=[];
-for(const src of ['rules.js','demo-data.js','real-data.js','js/import.js','js/normalize.js','js/matrix.js','js/export.js']){
+for(const src of ['rules.js','demo-data.js','real-data.js','aigov-data.js','js/import.js','js/normalize.js','js/matrix.js','js/export.js']){
   const p=path.resolve(__dirname,'../docs',src);
   if(fs.existsSync(p)){require(p);loaded.push(src);}
 }
@@ -21,16 +21,16 @@ function check(name,needs,fn){
 const P=['parseCSV'],N=['validateAndNormalize'],M=['analyze'],E=['toCSV','toMarkdown'];
 
 check('가상 예시 12건은 모두 시연용 가상자료',[],()=>{assert.equal(CIVICTA_DEMO.length,12);assert(CIVICTA_DEMO.every(r=>r.verification==='시연용 가상자료'));});
-check('가상 예시: 분류 12 = 칸 합 12, 미관찰 10/20',[...N,...M],()=>{
+check('가상 예시: 분류 12 = 칸 합 12, 미관찰 15/25',[...N,...M],()=>{
   const m=A.analyze(A.validateAndNormalize(CIVICTA_DEMO).records);
-  assert.equal(m.count,12);assert.equal(m.counted,12);assert.equal(m.cells.flat(2).length,12);assert.equal(m.gaps,10);assert.equal(m.demo,true);
+  assert.equal(m.count,12);assert.equal(m.counted,12);assert.equal(m.cells.flat(2).length,12);assert.equal(m.gaps,15);assert.equal(m.demo,true);
 });
-check('실존 16편: 분류 16, 미관찰 12/20, 칸 3개 손 검산',[...P,...N,...M],()=>{
+check('실존 16편: 분류 16, 미관찰 17/25, 칸 3개 손 검산',[...P,...N,...M],()=>{
   const p=A.parseCSV(CIVICTA_REAL_CSV);assert.equal(p.warnings.length,0);
   const n=A.validateAndNormalize(p.records);assert.equal(n.warnings.length,0);
   const m=A.analyze(n.records),R=CIVICTA_RULES;
   const cell=(h,s)=>m.cells[R.hciDimensions.indexOf(h)][R.policyStages.indexOf(s)].map(r=>r.id);
-  assert.equal(m.count,16);assert.equal(m.counted,16);assert.equal(m.gaps,12);assert.equal(m.demo,false);
+  assert.equal(m.count,16);assert.equal(m.counted,16);assert.equal(m.gaps,17);assert.equal(m.demo,false);
   assert.deepEqual(cell('숙의·상호작용','숙의·공론화'),['REF-01','REF-03','REF-08','REF-11','REF-12']);
   assert.deepEqual(cell('신뢰·책임성','정책설계·결정'),['REF-05','REF-09','REF-10']);
   assert.deepEqual(cell('피드백·반영추적','집행·평가'),['REF-02']);
@@ -49,7 +49,7 @@ check('담당 파일 없이 쓰는 미리 읽어 둔 실존 16편이 CSV와 같�
 check('B 범위: 미리 읽어 둔 실존 16편으로 칸 손 검산·필터',[...M,'filterRecords'],()=>{
   const m=A.analyze(CIVICTA_REAL),R=CIVICTA_RULES;
   const cell=(h,s)=>m.cells[R.hciDimensions.indexOf(h)][R.policyStages.indexOf(s)].map(r=>r.id);
-  assert.equal(m.counted,16);assert.equal(m.gaps,12);
+  assert.equal(m.counted,16);assert.equal(m.gaps,17);
   assert.deepEqual(cell('숙의·상호작용','숙의·공론화'),['REF-01','REF-03','REF-08','REF-11','REF-12']);
   assert.deepEqual(m.countsByHci.map(o=>o.value),[3,2,7,1,3]);
   assert.equal(A.filterRecords(CIVICTA_REAL,{policy_stage:'숙의·공론화'}).length,8);
@@ -88,7 +88,7 @@ check('전체 흐름: other-input.csv를 정책 단계로 걸러도 보고서 �
 });
 check('B 범위: 보고서 숫자 = 집계 숫자',[...M,...E],()=>{
   const md=A.toMarkdown(CIVICTA_REAL,A.analyze(CIVICTA_REAL));
-  assert(md.includes('집계 대상: 16건'));assert(md.includes('표본에서 미관찰된 조합: 12개'));
+  assert(md.includes('집계 대상: 16건'));assert(md.includes('표본에서 미관찰된 조합: 17개'));
   assert(md.includes('| 숙의·상호작용 | 2 | 5 | 0 | 0 |'));assert(!md.includes('실증 분석 결과가 아닙니다'));
 });
 check('다른 입력: 제외 2줄·미분류 2·중복 DOI·형식·연도 경고',[...P,...N,...M],()=>{
@@ -102,6 +102,22 @@ check('다른 입력: 제외 2줄·미분류 2·중복 DOI·형식·연도 경�
   assert(n.warnings.some(w=>w.includes('T-04')&&w.includes('DOI 형식')));
   assert(n.warnings.some(w=>w.includes('T-07')&&w.includes('발행연도')));
   assert(n.warnings.some(w=>w.includes('T-02')&&w.includes('정책단계')));
+});
+check('AI 거버넌스 17편: 1.1.0 기준은 미분류 7, 1.2.0(AI 설계·개발 추가)은 분류 17 (개인 과제)',[...P,...N,...M],()=>{
+  const p=A.parseCSV(CIVICTA_AIGOV_CSV),R=CIVICTA_RULES;assert.equal(p.records.length,17);assert.equal(p.warnings.length,0);
+  assert.equal(plain(CIVICTA_AIGOV_CSV),plain(read('ai-governance-literature.csv')));
+  // 개정 전: rules.js 1.1.0과 같은 정책 단계 4개
+  const old={...R,policyStages:R.policyStages.filter(s=>s!=='AI 설계·개발')};assert.equal(old.policyStages.length,4);
+  const before=A.validateAndNormalize(p.records,old);
+  assert.equal(before.records.filter(r=>r.policy_stage==='미분류').length,7);
+  assert.equal(before.warnings.filter(w=>w.includes('등록되지 않은 정책단계')).length,7);
+  // 개정 후: 같은 입력이 모두 분류되고, 7편은 AI 설계·개발 열로 감
+  const after=A.validateAndNormalize(p.records),m=A.analyze(after.records);
+  assert.equal(after.warnings.length,0);assert.equal(m.counted,17);assert.equal(m.unclassified,0);assert.equal(m.gaps,12);
+  const cell=(h,s)=>m.cells[R.hciDimensions.indexOf(h)][R.policyStages.indexOf(s)].map(r=>r.id);
+  assert.deepEqual(cell('피드백·반영추적','AI 설계·개발'),['AIG-03','AIG-05','AIG-09']);
+  assert.deepEqual(cell('신뢰·책임성','AI 설계·개발'),['AIG-02','AIG-13']);
+  assert.equal(R.policyStages.map((s,j)=>m.cells.reduce((a,row)=>a+row[j].length,0)).join(','),'4,1,3,2,7');
 });
 check('따옴표 안 쉼표·줄바꿈·이중 따옴표',[...P],()=>{
   const p=A.parseCSV('id,title,year,policy_stage,hci_dimension\n"A","제목, 공론화 ""검토""\n둘째 줄",2024,의제설정,정보이해·설명');

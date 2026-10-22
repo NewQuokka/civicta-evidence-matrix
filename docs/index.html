@@ -24,6 +24,7 @@
           <p class="hero-copy">신흥기술 영향평가의 시민참여 연구를 <strong>정책 단계 × HCI 차원</strong>으로 비교하고,<br class="desktop"> 문헌 근거가 상대적으로 부족한 조합을 발견하는 연구도구입니다.</p>
           <div class="hero-actions">
             <button type="button" class="button primary" id="load-real">실존 문헌 16편 불러오기 <span aria-hidden="true">→</span></button>
+            <button type="button" class="button ghost" id="load-aigov">AI 거버넌스 17편</button>
             <button type="button" class="button ghost" id="load-demo">가상 예시 12건(기능 시연)</button>
             <a class="button ghost" href="#upload">내 문헌 자료 입력하기</a>
           </div>
@@ -103,7 +104,7 @@
       <section class="stat-grid" aria-label="분석 현황">
         <article class="stat-card"><span>분석 대상 문헌</span><strong id="stat-total">0</strong><small>현재 필터 기준</small></article>
         <article class="stat-card"><span>매트릭스 분류 완료</span><strong id="stat-classified">0</strong><small>정책 단계·HCI 차원 모두 입력</small></article>
-        <article class="stat-card"><span>표본 미관찰 조합</span><strong id="stat-gap">—</strong><small>전체 20개 조합 중</small></article>
+        <article class="stat-card"><span>표본 미관찰 조합</span><strong id="stat-gap">—</strong><small id="stat-gap-total">전체 25개 조합 중</small></article>
         <article class="stat-card"><span>정책 반영 근거 표시</span><strong id="stat-trace">0</strong><small>원문 검토와 별도 확인 필요</small></article>
       </section>
       <section id="dashboard" class="panel" aria-labelledby="matrix-title">
@@ -136,7 +137,7 @@
       <footer class="footer"><span><strong>CivicTA</strong> — Technology Assessment × HCI</span><span>독립적 검증 필요 · AI 자동 판단 없음 · 개인/비공개 정보 업로드 금지</span></footer>
     </div>
   </main>
-  <script src="rules.js"></script><script src="demo-data.js"></script><script src="real-data.js"></script><script src="ai-sample.js"></script>
+  <script src="rules.js"></script><script src="demo-data.js"></script><script src="real-data.js"></script><script src="aigov-data.js"></script><script src="ai-sample.js"></script>
   <!-- A(팀원): js/import.js · js/normalize.js  /  B(소유자): js/matrix.js · js/export.js  /  공동: js/app.js -->
   <script src="js/import.js"></script><script src="js/normalize.js"></script><script src="js/matrix.js"></script><script src="js/export.js"></script><script src="js/app.js"></script>
   <!-- 자동화: js/ai.js(호출·검사) · js/auto-panel.js(화면) -->

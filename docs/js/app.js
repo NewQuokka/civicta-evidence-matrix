@@ -14,6 +14,9 @@
  const options=(id,values)=>{ const el=$(id);values.forEach(value=>{const node=document.createElement('option');node.value=value;node.textContent=value;el.appendChild(node);});};
  options('verification-filter',rules.verificationStates);
  options('policy-filter',rules.policyStages);
+ // 칸 수는 rules.js 범주 수에서 계산한다(1.2.0에서 정책 단계가 5개로 늘어 20칸 → 25칸).
+ const CELLS=rules.policyStages.length*rules.hciDimensions.length;
+ $('stat-gap-total').textContent=`전체 ${CELLS}개 조합 중`;
  options('hci-filter',rules.hciDimensions);
  function tell(msg,isError=false){$('status-message').textContent=msg;$('status-message').classList.toggle('error',isError);}
  function load(records,warnings=[],label='사용자 자료'){
@@ -32,7 +35,7 @@
  function render(){
   const rows=currentRows(),result=analyze(rows),empty=rows.length===0;
   $('stat-total').textContent=rows.length;$('stat-classified').textContent=result.counted;
-  $('stat-gap').textContent=empty?'—':`${result.gaps}/20`;$('stat-trace').textContent=result.traceable;
+  $('stat-gap').textContent=empty?'—':`${result.gaps}/${CELLS}`;$('stat-trace').textContent=result.traceable;
   $('data-type').textContent=result.demo?'가상 시연 데이터 포함':state.records.length?'사용자 문헌 데이터':'데이터 대기';
   const head=$('heatmap').querySelector('thead'),body=$('heatmap').querySelector('tbody');
   head.innerHTML='<tr><th scope="col">HCI 차원 ↓ / 정책 →</th>'+rules.policyStages.map(s=>`<th scope="col">${html(s)}</th>`).join('')+'</tr>';
@@ -102,6 +105,10 @@
  $('load-real').addEventListener('click',()=>{
    if(typeof api.parseCSV!=='function'){load(window.CIVICTA_REAL,[],'실존 문헌(임시 대체: 미리 읽어 둔 16편)');return;}
    try{const parsed=api.parseCSV(window.CIVICTA_REAL_CSV);load(parsed.records,parsed.warnings,'실존 문헌(초록 기준 코딩 초안)');}catch(e){tell(e.message,true);}
+ });
+ $('load-aigov').addEventListener('click',()=>{
+   if(typeof api.parseCSV!=='function'){tell('js/import.js(A)가 아직 없습니다.',true);return;}
+   try{const parsed=api.parseCSV(window.CIVICTA_AIGOV_CSV);load(parsed.records,parsed.warnings,'AI 거버넌스 실존 문헌(초록 기준 코딩 초안)');}catch(e){tell(e.message,true);}
  });
  $('import-text').addEventListener('click',()=>{if(typeof api.parseCSV!=='function'){tell('js/import.js(A)가 아직 없습니다.',true);return;}try{let parsed=api.parseCSV($('csv-text').value);load(parsed.records,parsed.warnings,'붙여넣기 CSV');}catch(e){tell(e.message,true);}});
  $('csv-file').addEventListener('change',async ev=>{
